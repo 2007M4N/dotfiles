@@ -24,7 +24,7 @@ autoload -Uz promptinit
 promptinit 
 prompt bart
 # set default browser
-  (( ${+BROWSER} )) || export BROWSER="w3m"
+export BROWSER2="w3m"
 
 ########################
 ####### Alias ##########
@@ -43,12 +43,14 @@ alias ..='cd ..'
 alias A='sudo pacman-color -S'
 alias As='pacman-color -Ss'
 alias hr='hash -r'
+alias sduo='sudo'
 
 # Tools and Programm
 #
 alias gochroot='sudo nice -n 19 chroot /home/rootman/openmoko/archmobile/work /bin/bash -l'
 alias proxmark='~/src/proxmark3-read-only/client/proxmark3'
 alias proxmark_snoop='~/src/proxmark3-read-only/client/snoop'
+alias neo_start='sudo /etc/rc.d/openmoko-usb-networking restart'
 
 # Console Stuff
 alias xmplayer='mplayer -fs -stop-xscreensaver -shuffle'
@@ -110,6 +112,10 @@ export PATH=${PATH}:${DEVKITARM}/bin
 ###### Functions #######
 ########################
 #
+#Funktion for ps -ax | grep 'ARGUMENT'
+funtion psa()
+	{ ps -ax | grep $@ }
+
 # Function to uncompress different files
 function x()
 {
@@ -211,18 +217,18 @@ fi
 function smbmount()
 {
 	dir=/media/smbshares/
-	if [ -d $dir$2 ] ; then
-	if [ "$(ls -A $dir$2)" ] ; then
-		echo "Share $2 is already mounted" 
+	echo "sudo mount -t cifs "//$1/$2" "$dir$1/$2" -o credentials=/root/.smbcredentials_$3,workgroup="$3""
+	if [ -d $dir$1/$2 ] ; then
+	if [ "$(ls -A $dir$1/$2)" ] ; then
+		echo "Share $1/$2 is already mounted" 
 	return 1	
 	fi
 	echo "Server=$1 Share=$2 Path=$dir$2 Workgroup=$3"
-	sudo mount -t cifs "//$1/$2" "$dir$2" -o credentials=/root/.smbcredentials_$3,workgroup="$3" 
 	echo "Share $2 has been successfully mounted"
 else
-	sudo mkdir "$dir$2"
-	echo "Folder $2 has been created" 
-	sudo mount -t cifs "//$1/$2" "$dir$2" -o credentials=/root/.smbcredentials_$3,workgroup="$3" 
+	sudo mkdir -p "$dir$1/$2"
+	echo "Folder $1/$2 has been created" 
+	sudo mount -t cifs "//$1/$2" "$dir$1/$2" -o credentials=/root/.smbcredentials_$3,workgroup="$3" 
 	echo "Share $2 has been successfully mounted"
 fi
 }
@@ -232,10 +238,41 @@ fi
  { mkdir -p "$@"; cd "$@" }
 
 # Übersetzung bei dict.leo.org
-   leo() { $BROWSER "http://dict.leo.org/?search=$*" }
+   leo() { w3m "http://dict.leo.org/?search=$*" }
 
 # Set shutdown Timer 
 # Usage: timer <time in minutes> 
 #
 timer()
 	{ sudo shutdown -t 60 -h "$@" "Shutdown Timer has been activated will go down in $@ minutes" }
+
+function mstsc()
+{ rdesktop -n roman -k de -a 16 -u unitit -g 1024x768 -d mp.local $1.mp.local } 
+
+funktion say_de()
+{ espeak -v de "$@"}
+funktion say()
+{ espeak "$@"}
+
+funktion gochroot_neo()
+{
+	cd "/home/rootman/Openmoko/shr/chroot/shr-chroot"
+	echo "change to directory and start chroot"
+	pwd
+	sudo ./shr-chroot.sh
+	echo "Enter the chroot"
+	su - bitbake
+	echo "change to bitbake user"
+	cd shr-unstable
+	
+	echo " to build unstable packages"
+	. ./setup-env 
+	echo "build env"
+	bitbake -k shr_image
+	echo "bitbake "shr_image""
+} 
+
+function xxrandr()
+{
+		~/scripts/xrandr_docking.sh right
+	}
