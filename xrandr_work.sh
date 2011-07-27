@@ -3,7 +3,7 @@
 EXTERNAL_OUTPUT="VGA1"
 INTERNAL_OUTPUT="LVDS1"
 # EXTERNAL_LOCATION may be one of: left, right, above, or below
-EXTERNAL_LOCATION="right"
+EXTERNAL_LOCATION="$1"
 case "$EXTERNAL_LOCATION" in
        left|LEFT)
                EXTERNAL_LOCATION="--left-of $INTERNAL_OUTPUT"
