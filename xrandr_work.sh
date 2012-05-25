@@ -24,7 +24,7 @@ esac
  
 xrandr |grep $EXTERNAL_OUTPUT | grep " connected "
 if [ $? -eq 0 ]; then
-    xrandr --output $INTERNAL_OUTPUT --auto --output $EXTERNAL_OUTPUT --auto $EXTERNAL_LOCATION
+    xrandr --output $INTERNAL_OUTPUT --primary --auto --output $EXTERNAL_OUTPUT --auto $EXTERNAL_LOCATION
     # Alternative command in case of trouble:
     # (sleep 2; xrandr --output $INTERNAL_OUTPUT --auto --output $EXTERNAL_OUTPUT --auto $EXTERNAL_LOCATION) &
 else
