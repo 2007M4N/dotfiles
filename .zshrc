@@ -40,11 +40,14 @@ alias c="clear"
 alias dir='ls -lh --color=auto'
 alias gvim='gvim -geom 82x35'
 alias ..='cd ..'
-alias A='sudo pacman-color -S'
-alias As='pacman-color -Ss'
 alias hr='hash -r'
 alias sduo='sudo'
-
+alias q='exit'
+alias e='vim'
+alias mc='mc -S darkfar --colors normal=green'
+alias se='sudo vim'
+alias FTP='cd /media/Diverse/ftp/'
+alias xterm='xterm -bg "#000000" -fg "#00FF00" -cr 0000FF +cm +lc -e /bin/bash'
 # Tools and Programm
 #
 alias gochroot='sudo nice -n 19 chroot /home/rootman/openmoko/archmobile/work /bin/bash -l'
@@ -53,8 +56,8 @@ alias proxmark_snoop='~/src/proxmark3-read-only/client/snoop'
 alias neo_start='sudo /etc/rc.d/openmoko-usb-networking restart'
 
 # Console Stuff
-alias xmplayer='mplayer -fs -stop-xscreensaver -shuffle'
-alias vmplayer='mplayer -fs -stop-xscreensaver'
+alias xmplayer=' mplayer -fs -shuffle -fstype avi flv -idx'
+alias vmplayer='mplayer -fs'
 # safety features
 # alias cp='cp -i'
 alias mv='mv -i'
@@ -62,15 +65,19 @@ alias rm='rm -i'
 # alias ln='ln -i'
 #
 # Pacman alias examples
-alias pacupg='sudo pacman-color -Syu'        # Synchronize with repositories before upgrading packages that are out of date on the local system.
-alias pacin='sudo pacman-color -S'           # Install specific package(s) from the repositories
-alias pacins='sudo pacman-color -U'          # Install specific package not from the repositories but from a file 
-alias pacre='sudo pacman-color -R'           # Remove the specified package(s), retaining its configuration(s) and required dependencies
-alias pacrem='sudo pacman-color -Rns'        # Remove the specified package(s), its configuration(s) and unneeded dependencies
-alias pacrep='pacman-color -Si'              # Display information about a given package in the repositories
-alias pacreps='pacman-color -Ss'             # Search for package(s) in the repositories
-alias pacloc='pacman-color -Qi'              # Display information about a given package in the local database
-alias paclocs='pacman-color -Qs'             # Search for package(s) in the local database
+alias A='yaourt'
+alias AU='yaourt -Syyu'
+alias Au='yaourt -Syy'
+alias AG='cd ~/src/; yaourt -G'
+#alias pacupg='sudo pacman-color -Syu'        # Synchronize with repositories before upgrading packages that are out of date on the local system.
+#alias pacin='sudo pacman-color -S'           # Install specific package(s) from the repositories
+#alias pacins='sudo pacman-color -U'          # Install specific package not from the repositories but from a file 
+#alias pacre='sudo pacman-color -R'           # Remove the specified package(s), retaining its configuration(s) and required dependencies
+#alias pacrem='sudo pacman-color -Rns'        # Remove the specified package(s), its configuration(s) and unneeded dependencies
+#alias pacrep='pacman-color -Si'              # Display information about a given package in the repositories
+#alias pacreps='pacman-color -Ss'             # Search for package(s) in the repositories
+#alias pacloc='pacman-color -Qi'              # Display information about a given package in the local database
+#alias paclocs='pacman-color -Qs'             # Search for package(s) in the local database
 
 # GLOBAL ALIAS
 # ############
@@ -112,10 +119,34 @@ export PATH=${PATH}:${DEVKITARM}/bin
 ###### Functions #######
 ########################
 #
+########################
+# #####++mplayer ##### #
+#
+# funktion kill mplayer
+funktion kmplayer()
+{
+	echo "mplayer will be killed in "$1" Minutes"
+	echo "Use 'q' key to quit the countdown"
+	utimer --countdown="$1"m && for i in $(pgrep mplayer); do skill $i; done 
+	}
+# funktion zonk
+funktion zonk()
+{
+       	mplayer /usr/share/sounds/zonk.mp3
+}
+# funktion jeopardy
+funktion jeopardy()
+{
+       	mplayer /usr/share/sounds/jeopardy-theme.mp3
+}
 #Funktion for ps -ax | grep 'ARGUMENT'
 funtion psa()
 	{ ps -ax | grep $@ }
-
+#Funktion Kill
+function sfafill()
+{
+	utimer --countdown="$1"m && for i in $(pgrep mplayer); do skill $i; done 
+}
 # Function to uncompress different files
 function x()
 {
@@ -211,6 +242,7 @@ fi
     fi
   }
 
+
 # Function SMBMOUNT 
 # Usage: smbmount <server> <share> <domain/workgroup> 
 # Info you have to create a credential file for every domain/workgroup with user and password befor running the function 
@@ -228,7 +260,7 @@ function smbmount()
 else
 	sudo mkdir -p "$dir$1/$2"
 	echo "Folder $1/$2 has been created" 
-	sudo mount -t cifs "//$1/$2" "$dir$1/$2" -o credentials=/root/.smbcredentials_$3,workgroup="$3" 
+	sudo mount -t cifs "//$1.mp.local/$2" "$dir$1/$2" -o credentials=/root/.smbcredentials_$3,workgroup="$3" 
 	echo "Share $2 has been successfully mounted"
 fi
 }
@@ -247,7 +279,7 @@ timer()
 	{ sudo shutdown -t 60 -h "$@" "Shutdown Timer has been activated will go down in $@ minutes" }
 
 function mstsc()
-{ rdesktop -n roman -k de -a 16 -u unitit -g 1024x768 -d mp.local $1.mp.local } 
+{ rdesktop -n the-giwe08 -k de -a 16 -u unitit -g 1024x768 -d mp.local $1.mp.local } 
 
 funktion say_de()
 { espeak -v de "$@"}
@@ -272,7 +304,30 @@ funktion gochroot_neo()
 	echo "bitbake "shr_image""
 } 
 
-function xxrandr()
+
+funktion wwicd()
 {
-		~/scripts/xrandr_docking.sh right
-	}
+	if [ "$1" ]; 
+       	then
+		case "$1" in
+			s | S) wicd-cli -y -S ; wicd-cli -y -l ;;
+			l) wicd-cli -y -l ;;
+			0 | 1 | 2 | 3 | 4) wicd-cli -c -y -n "$1" ;  wicd-cli -y -d ;;
+			-h | --help) "$HELP" ;;
+			*) 
+			echo "Please input Argument"
+			echo "'s' for Scan"
+			echo "'s 0' for Scan and connect to the strongest signal"
+			echo "'l' for list"
+			echo "Integer to connect" ;;
+		esac
+	fi
+		}
+#####some infos
+#for i in *' '*; do   mv "$i" `echo $i | sed -e 's/ /_/g'`; done
+#Replacing spaces in the file names
+#
+#If you want to try this out before pulling the trigger just change mv to echo mv.
+#
+#for i in $(ls);do mv $i `echo $i | sed 's/Stargate_SG1_Season/Season/g'`; done
+#
